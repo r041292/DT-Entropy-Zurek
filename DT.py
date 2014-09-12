@@ -33,7 +33,7 @@ for i in range(0,len(contenido)):
 #print(valoresContenido)
 #print(valoresResultados)
 
-def calPosibilidad(columna,valColumna,resultado):
+def calPosibilidad(contenido,columna,valColumna,resultado):
 	contResultado = 0
 	contvalColumna=0
 	for i in range(0,len(contenido)):
@@ -48,7 +48,7 @@ def calPosibilidad(columna,valColumna,resultado):
 	return float(contResultado/contvalColumna)
 
 
-def calNumeroEnCol(columna,valColumna):
+def calNumeroEnCol(contenido,columna,valColumna):
 	contvalColumna=0
 	for i in range(0,len(contenido)):
 		if(contenido[i][columna]==valColumna):
@@ -56,15 +56,15 @@ def calNumeroEnCol(columna,valColumna):
 
 	return contvalColumna
 
-def calEntropia(columna):
+def calEntropia(contenido,columna):
 	posibilidades=[]
 	result = 0
 	for i in range(0,len(valoresContenido)):
 		temp=1
 		for j in range(0, len(valoresResultados)):
-			temp=temp*float(calPosibilidad(columna,str(i),str(j)))
+			temp=temp*float(calPosibilidad(contenido,columna,str(i),str(j)))
 
-		temp2=float(calNumeroEnCol(columna,str(i)))
+		temp2=float(calNumeroEnCol(contenido,columna,str(i)))
 		posibilidades.append(float(temp*(temp2/len(contenido))))
 		#print(posibilidades)
 
@@ -74,7 +74,38 @@ def calEntropia(columna):
 	print("Entropia para Columna",columna,result)
 	return result
 
-for i in range(0,len(etiquetas)):
-	calEntropia(i)
+def eliminarColumna(contenido,etiquetas,columna,valor):
+	etiquetas.pop(columna)
+	for i in range(0,len(contenido)):
+		if(contenido[i][columna]==valor):
+			contenido.pop(i)
+		else:
+			contenido[i].pop(columna)
+	return contenido
+
+def buscarMenor(entropias):
+	temp=9999
+	indicador = -99
+	for i in range(0,len(entropias)):
+		if(entropias[i]<temp):
+			temp=entropias[i]
+			indicador = i
+	return indicador
+
+
+entropias =[]
+for i in range(0,len(etiquetas)-1):
+	entropias.append(calEntropia(contenido,i))
+
+menorColumna=buscarMenor(entropias)
+
+tree=Tree()
+tree.create_node({"Etiqueta":etiquetas[menorColumna] , "Camino": "Raiz", "CamElg":0},0)
+tree.show()
+
+eliminarColumna(contenido,etiquetas,menorColumna,0)
+print(contenido)
+print(etiquetas)
+
 
 
