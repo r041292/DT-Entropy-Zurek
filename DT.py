@@ -113,7 +113,7 @@ def UnaPos(contenido, valorContenido,columna):
 		temp2 = {"valorContenido": valorContenido, "valorResultado": valoresResultados[i], "valor":temp}
 		algo.append(copy.deepcopy(temp2))
 
-	print(algo)
+
 	numCeros = 0
 	noCero = -1
 	for i in range(0,len(algo)):
@@ -133,7 +133,6 @@ entropias =[]
 
 for i in range(0,len(etiquetas)-1):
 	entropias.append(calEntropia(contenido,i))
-print entropias
 menorColumna=buscarMenor(entropias)
 
 tree=Tree()
@@ -158,37 +157,41 @@ hijosRaiz=0
 
 ide=1
 print UnaPos(contenido,"0",3)
-while(hijosRaiz<=valoresResultados):
-	print ("----")
+while(hijosRaiz<=len(valoresResultados)):
+	aaa = raw_input("")
+	print ("------------------")
 	tree.show()
-	if(len(hijo._fpointer)<valoresResultados):
+	if(len(hijo._fpointer)<valoresResultados and len(contenido)>2):
 		del entropias[:]
 		label=menorColumna
 		elim=eliminarColumna(copy.deepcopy(contenido),copy.deepcopy(etiquetas),menorColumna,str(valoresContenido[len(hijo._fpointer)]))
 		contenido=elim["contenido"]
-		histFunc.append(copy.deepcopy(contenido))
 		etiquetas=elim["etiquetas"]
-		hisEtiq.append(etiquetas)
 		for i in range(0,len(etiquetas)-1):
 			entropias.append(calEntropia(contenido,i))
 
 		print(contenido)
-		print (entropias)
+		print(entropias)
 		menorColumna=buscarMenor(entropias)
-		print "Unapos: ",valoresContenido[len(hijo._fpointer)]," , ", menorColumna
 		x=UnaPos(contenido,str(valoresContenido[len(hijo._fpointer)]),menorColumna)
-		print "X=",x
+
+		allZeroEnt=0
+		for i in range(0,len(entropias)):
+			if(entropias[i]<>0.0):
+				allZeroEnt+=1
+
 		if (x==-1):
+			histFunc.append(copy.deepcopy(contenido))
+			hisEtiq.append(copy.deepcopy(etiquetas))
 			if(hijo.identifier == 0):
-				print("HIJO!")
 				hijosRaiz+=1
 			tree.create_node({"Etiqueta":etiquetas[menorColumna],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
 			histHij.append(tree.get_node(ide))
 			hijo=tree.get_node(ide)
-			
 
 		else:
-			if(len(entropias)==1 and entropias[0]==0.0):
+			if(allZeroEnt==0 and len(contenido)>1):
+				print "here"
 				tree.create_node({"Etiqueta":etiquetas[0],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
 				padre = ide
 				ide+=1
@@ -199,13 +202,11 @@ while(hijosRaiz<=valoresResultados):
 			else:
 				tree.create_node({"Valor":x, "Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
 
-				if(tree.get_node(0)._fpointer==valoresResultados):
-					hijosRaiz=valoresResultados+1
-					hijo=histHij.pop()
-					contenido=histFunc.pop()
-					etiquetas=hisEtiq.pop()
+				if(len(tree.get_node(0)._fpointer)==len(valoresResultados)):
+					hijosRaiz=len(valoresResultados)+1
 		ide+=1
 	else:
+		print ("--------BACKTRACKING----------")
 		hijo=histHij.pop()
 		contenido=histFunc.pop()
 		etiquetas=hisEtiq.pop()
