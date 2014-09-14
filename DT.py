@@ -36,7 +36,7 @@ for i in range(0,len(contenido)):
 def calPosibilidad(contenido,columna,valColumna,resultado):
 	contResultado = 0
 	contvalColumna=0
-	for i in range(0,len(contenido)-1):
+	for i in range(0,len(contenido)):
 		if(contenido[i][columna]==valColumna):
 			contvalColumna+=1
 			if (contenido[i][len(etiquetas)-1]==resultado):
@@ -44,8 +44,11 @@ def calPosibilidad(contenido,columna,valColumna,resultado):
 
 	contvalColumna=contvalColumna*1.0
 	contResultado=contResultado*1.0
+	try:
 	#print(float(contResultado/contvalColumna))
-	return float(contResultado/contvalColumna)
+		return float(contResultado/contvalColumna)
+	except Exception:
+		return 0
 
 
 def calNumeroEnCol(contenido,columna,valColumna):
@@ -54,7 +57,10 @@ def calNumeroEnCol(contenido,columna,valColumna):
 		if(contenido[i][columna]==valColumna):
 			contvalColumna+=1
 
-	return contvalColumna
+	if(contvalColumna==0):
+		return 1
+	else:
+		return contvalColumna
 
 def calEntropia(contenido,columna):
 	posibilidades=[]
@@ -100,14 +106,14 @@ def UnaPos(contenido, valorContenido,columna):
 	algo=[]
 	for i in range(0,len(valoresResultados)):
 		temp=0
-		for k in range(0, len(contenido)-1):
+		for k in range(0, len(contenido)):
 			if(contenido[k][columna]==valorContenido):
 				if(contenido[k][len(etiquetas)-1]==valoresResultados[i]):
 					temp+=1
 		temp2 = {"valorContenido": valorContenido, "valorResultado": valoresResultados[i], "valor":temp}
 		algo.append(copy.deepcopy(temp2))
 
-	#print(algo)
+	print(algo)
 	numCeros = 0
 	noCero = -1
 	for i in range(0,len(algo)):
@@ -127,25 +133,12 @@ entropias =[]
 
 for i in range(0,len(etiquetas)-1):
 	entropias.append(calEntropia(contenido,i))
-
+print entropias
 menorColumna=buscarMenor(entropias)
 
 tree=Tree()
 tree.create_node({"Etiqueta":etiquetas[menorColumna] , "Camino": "Raiz", "CamElg":0},0)
-#tree.show()
-#print("---")
-#print(eliminarColumna(copy.deepcopy(contenido),copy.deepcopy(etiquetas),menorColumna,"0"))
-#contenido =  eliminarColumna(copy.deepcopy(contenido),copy.deepcopy(etiquetas),menorColumna,"0")["contenido"]
-#etiquetas = eliminarColumna(copy.deepcopy(contenido),copy.deepcopy(etiquetas),menorColumna,"0")["etiquetas"]
 
-#print (contenido)
-#entropias =[]
-#for i in range(0,len(etiquetas)-1):
-#	entropias.append(calEntropia(contenido,i))
-
-#print(entropias)
-#menorColumna=buscarMenor(entropias)
-#print(menorColumna)
 
 
 
@@ -166,6 +159,8 @@ hijosRaiz=0
 ide=1
 print UnaPos(contenido,"0",3)
 while(hijosRaiz<=valoresResultados):
+	print ("----")
+	tree.show()
 	if(len(hijo._fpointer)<valoresResultados):
 		del entropias[:]
 		label=menorColumna
@@ -175,9 +170,10 @@ while(hijosRaiz<=valoresResultados):
 		etiquetas=elim["etiquetas"]
 		hisEtiq.append(etiquetas)
 		for i in range(0,len(etiquetas)-1):
-			print i 
 			entropias.append(calEntropia(contenido,i))
 
+		print(contenido)
+		print (entropias)
 		menorColumna=buscarMenor(entropias)
 		print "Unapos: ",valoresContenido[len(hijo._fpointer)]," , ", menorColumna
 		x=UnaPos(contenido,str(valoresContenido[len(hijo._fpointer)]),menorColumna)
@@ -186,19 +182,28 @@ while(hijosRaiz<=valoresResultados):
 			if(hijo.identifier == 0):
 				print("HIJO!")
 				hijosRaiz+=1
-			tree.create_node({"Etiqueta":etiquetas[label],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
+			tree.create_node({"Etiqueta":etiquetas[menorColumna],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
 			histHij.append(tree.get_node(ide))
 			hijo=tree.get_node(ide)
 			
 
 		else:
-			tree.create_node({"Valor":x},ide,hijo.identifier)
+			if(len(entropias)==1 and entropias[0]==0.0):
+				tree.create_node({"Etiqueta":etiquetas[0],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
+				padre = ide
+				ide+=1
+				for i in range(0,len(contenido)):
+					tree.create_node({"Valor":contenido[i][len(etiquetas)-1], "Camino":contenido[i][0]},ide,padre)
+					ide+=1
 
-			if(tree.get_node(0)._fpointer==valoresResultados):
-				hijosRaiz=valoresResultados+1
-				hijo=histHij.pop()
-				contenido=histFunc.pop()
-				etiquetas=hisEtiq.pop()
+			else:
+				tree.create_node({"Valor":x, "Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
+
+				if(tree.get_node(0)._fpointer==valoresResultados):
+					hijosRaiz=valoresResultados+1
+					hijo=histHij.pop()
+					contenido=histFunc.pop()
+					etiquetas=hisEtiq.pop()
 		ide+=1
 	else:
 		hijo=histHij.pop()
