@@ -162,23 +162,38 @@ while(hijosRaiz<=len(valoresResultados)):
 	print ("------------------")
 	tree.show()
 	if(len(hijo._fpointer)<valoresResultados and len(contenido)>2):
-		del entropias[:]
+		
+
 		label=menorColumna
+
+		print("contenido antes de eliminar",contenido)
+		print("voy a eliminar estos valores",str(valoresContenido[len(hijo._fpointer)]), " de esta columna ",menorColumna)
 		elim=eliminarColumna(copy.deepcopy(contenido),copy.deepcopy(etiquetas),menorColumna,str(valoresContenido[len(hijo._fpointer)]))
 		contenido=elim["contenido"]
 		etiquetas=elim["etiquetas"]
+
+		del entropias[:]
 		for i in range(0,len(etiquetas)-1):
 			entropias.append(calEntropia(contenido,i))
 
 		print(contenido)
 		print(entropias)
+		print("Hijos Raiz", hijosRaiz)
 		menorColumna=buscarMenor(entropias)
+		print("valor", str(valoresContenido[len(hijo._fpointer)]))
+		print("Menor Columna", menorColumna)
+		print(contenido)
 		x=UnaPos(contenido,str(valoresContenido[len(hijo._fpointer)]),menorColumna)
 
 		allZeroEnt=0
 		for i in range(0,len(entropias)):
 			if(entropias[i]<>0.0):
 				allZeroEnt+=1
+
+		ValoresActualesResultados = []
+		for i in range(0,len(contenido)):
+			if(not contenido[i][len(etiquetas)-1] in ValoresActualesResultados):
+				ValoresActualesResultados.append(contenido[i][len(etiquetas)-1])
 
 		if (x==-1):
 			histFunc.append(copy.deepcopy(contenido))
@@ -190,7 +205,7 @@ while(hijosRaiz<=len(valoresResultados)):
 			hijo=tree.get_node(ide)
 
 		else:
-			if(allZeroEnt==0 and len(contenido)>1):
+			if(allZeroEnt==0 and len(contenido)>1 and len(ValoresActualesResultados)>=2):
 				print "here"
 				tree.create_node({"Etiqueta":etiquetas[0],"Camino":valoresContenido[len(hijo._fpointer)]},ide,hijo.identifier)
 				padre = ide
@@ -210,3 +225,11 @@ while(hijosRaiz<=len(valoresResultados)):
 		hijo=histHij.pop()
 		contenido=histFunc.pop()
 		etiquetas=hisEtiq.pop()
+
+		del entropias[:]
+		for i in range(0,len(etiquetas)-1):
+			entropias.append(calEntropia(contenido,i))
+		menorColumna=buscarMenor(entropias)
+		print entropias
+
+tree.show()
