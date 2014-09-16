@@ -33,6 +33,9 @@ for i in range(0,len(contenido)):
 #print(valoresContenido)
 #print(valoresResultados)
 
+valoresResultados.sort()
+valoresContenido.sort()
+
 def calPosibilidad(contenido,columna,valColumna,resultado):
 	contResultado = 0
 	contvalColumna=0
@@ -194,7 +197,7 @@ while(hijosRaiz<=len(valoresResultados)):
 		for i in range(0,len(contenido)):
 			if(not contenido[i][len(etiquetas)-1] in ValoresActualesResultados):
 				ValoresActualesResultados.append(contenido[i][len(etiquetas)-1])
-
+				
 		if (x==-1):
 			histFunc.append(copy.deepcopy(contenido))
 			hisEtiq.append(copy.deepcopy(etiquetas))
